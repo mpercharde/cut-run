@@ -133,7 +133,7 @@ for file in "$dir"*_1* ; do
     echo "2. aligning $base to yeast repeat-masked genome and sorting in one"
     (bowtie -p8 -x /data/refs/mm10/SC_rm -1 trimmed/$trimfile1 -2 trimmed/$trimfile2 \
     --local --very-sensitive-local --no-unal --no-mixed --no-discordant --phred33 -I 10 -X 700 \
-    | samtools view -Suo - - | samtools sort - -o sorted_bam/${base}_SC.sorted.bam) 2> alignment_summaries/${base}_SCalignment.txt
+    | samtools view -Suo - - | samtools sort - -o sorted_bam/${base}_SC.sorted.bam) 2> alignment_summaries/${base}_SC_alignment.txt
 
     # tophat -o ${base}_aligned/ -p 8 -g 20 --no-coverage-search --library-type fr-unstranded \
     # --no-novel-indels --transcriptome-index=/data/refs/hg19/transcriptome_data/known_genes /data/refs/hg19/genome trimmed/$trimfile1 trimmed/$trimfile2
@@ -141,7 +141,7 @@ for file in "$dir"*_1* ; do
     # echo "3. sorting $base bam file ready for DL"
     # echo ""
     # samtools sort -o sorted_bam/${base}.sorted.bam ${base}_aligned/accepted_hits.bam
-    echo "cleaning up: removing raw files and removing non-sorted file"
+    # echo "cleaning up: removing raw files and removing non-sorted file"
     # rm ${base}_aligned/accepted_hits.bam
     # rm $file1
     # rm $file2
