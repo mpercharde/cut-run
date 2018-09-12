@@ -68,6 +68,7 @@ fi
 
 mkdir -p trimmed/fastqc/
 mkdir -p sorted_bam/
+mkdir -p alignment_summaries/
 # echo "indexing the transcriptome data one time - prefix hg19" ###DO THIS FIRST TIME ###
 # tophat -G /data/refs/hg19/genes.gtf --transcriptome-index=transcriptome_data/known_genes /data/refs/hg19/genome
 
