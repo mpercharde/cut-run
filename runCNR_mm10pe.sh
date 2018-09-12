@@ -127,12 +127,12 @@ for file in "$dir"*_1* ; do
     echo ""
     # mkdir -p ${base}_aligned/
 
-    (bowtie -p8 -x /data/refs/mm10/mm10 -1 trimmed/$trimfile1 -2 trimmed/$trimfile2 \
+    (bowtie2 -p8 -x /data/refs/mm10/mm10 -1 trimmed/$trimfile1 -2 trimmed/$trimfile2 \
     --local --very-sensitive-local --no-unal --no-mixed --no-discordant --phred33 -I 10 -X 700 \
     | samtools view -Suo - - | samtools sort - -o sorted_bam/${base}.sorted.bam) 2> alignment_summaries/${base}_alignment.txt
 
     echo "2. aligning $base to yeast repeat-masked genome and sorting in one"
-    (bowtie -p8 -x /data/refs/scR64/SC_rm -1 trimmed/$trimfile1 -2 trimmed/$trimfile2 \
+    (bowtie2 -p8 -x /data/refs/scR64/SC_rm -1 trimmed/$trimfile1 -2 trimmed/$trimfile2 \
     --local --very-sensitive-local --no-unal --no-mixed --no-discordant --phred33 -I 10 -X 700 \
     | samtools view -Suo - - | samtools sort - -o sorted_bam/${base}_SC.sorted.bam) 2> alignment_summaries/${base}_SC_alignment.txt
 
