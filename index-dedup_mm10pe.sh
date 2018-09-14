@@ -135,13 +135,14 @@ for file in "$dir"*_1* ; do
    echo ""
    echo "3. deduplicating $base bam file"
    echo ""
+   mkdir -p dedup_bam
    samtools rmdup -s sorted_bam/${base}.sorted.bam dedup_bam/${base}.sorted.dedup.bam
 
    echo ""
    echo "4. Generating bam index for $base"
    echo ""
    samtools index sorted_bam/${base}.sorted.bam sorted_bam/${base}.sorted.bai
-   samtools index dedup_bam//${base}.sorted.dedup.bam dedup_bam//${base}.sorted.dedup.bai
+   samtools index dedup_bam/${base}.sorted.dedup.bam dedup_bam/${base}.sorted.dedup.bai
     echo ""
 
 done
