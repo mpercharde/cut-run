@@ -9,22 +9,17 @@
 
 #~~~~~~~~~~EDIT BELOW THIS LINE ~~~~~~~~~~~~~~~~~~#
 
-# CHECK IF YOU HAVE THE KNOWN_GENES FOLDER
-# IF NOT: FOR THE FIRST TIME RUN TRANSCRIPTOME INDEXING ALONE SEE BELOW, BEFORE SCRIPT. THEN RUN SCRIPT
-
 
 # DATA MUST BE ORGANIZED as _1.fq and _2.fq for each PAIR
 # Pipeline to take input dir with files "sample.fq" or "sample.fq.gz", outputs sorted bams
 # Doesn't work if input files are .fastq!
 # Bam files can then be DLed and fed into FeatureCounts in R
 
-#usage: ./runRNAseq-hg19PE.sh [options] [-i path/to/folder/]
+#usage: ./runRNAseq_mm10pe.sh [options] [-i path/to/folder/]
 
 #FOLDERS NEEDED IN ROOT:
   #raw/ (where raw files are)
 
-#transcriptome indexing - run in hg19 folder:
-# tophat -G /data/refs/hg19/hg19.gtf --transcriptome-index=transcriptome_data/known_genes /data/refs/hg19/genome
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 flagcheck=0
@@ -125,7 +120,6 @@ for file in "$dir"*_1* ; do
     echo ""
     echo "2. aligning $base to mm10 and sorting in one"
     echo ""
-    # mkdir -p ${base}_aligned/
 
     (bowtie2 -p8 -x /data/refs/mm10/mm10 -1 trimmed/$trimfile1 -2 trimmed/$trimfile2 \
     --local --very-sensitive-local --no-unal --no-mixed --no-discordant --phred33 -I 10 -X 1000 \
@@ -133,17 +127,21 @@ for file in "$dir"*_1* ; do
 
     echo "2. aligning $base to yeast repeat-masked genome and sorting in one"
     (bowtie2 -p8 -x /data/refs/scR64/SC_rm -1 trimmed/$trimfile1 -2 trimmed/$trimfile2 \
-    --local --very-sensitive-local --no-unal --no-mixed --no-discordant --phred33 -I 10 -X 1000 --no-overlap --no-dovetail \
+    --local --very-sensitive-local --no-unal --no-mixed --no-discordant --phred33 -I 10 -X 700 --no-overlap --no-dovetail \
     | samtools view -Suo - - | samtools sort - -o sorted_bam/${base}_SC.sorted.bam) 2> alignment_summaries/${base}_SC_alignment.txt
 
-    # tophat -o ${base}_aligned/ -p 8 -g 20 --no-coverage-search --library-type fr-unstranded \
-    # --no-novel-indels --transcriptome-index=/data/refs/hg19/transcriptome_data/known_genes /data/refs/hg19/genome trimmed/$trimfile1 trimmed/$trimfile2
-    # echo ""
-    # echo "3. sorting $base bam file ready for DL"
-    # echo ""
-    # samtools sort -o sorted_bam/${base}.sorted.bam ${base}_aligned/accepted_hits.bam
+    echo ""
+    echo "3. Generating bam index for $base"
+    echo ""
+    samtools index sorted_bam/${base}.sorted.bam sorted_bam/${base}.sorted.bai
+    echo ""
+
+    echo "4. Making bedgraph"
+    mkdir -p bedgraphs/
+    bedtools genomecov -ibam sorted_bam/${base}.sorted.bam -bga -pc \
+    | LC_COLLATE=C sort -k1,1 -k2,2n - > bedgraphs/${base}.bedGraph
+
     # echo "cleaning up: removing raw files and removing non-sorted file"
-    # rm ${base}_aligned/accepted_hits.bam
     # rm $file1
     # rm $file2
     echo "$base DONE!"
